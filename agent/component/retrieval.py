@@ -58,9 +58,8 @@ class Retrieval(ComponentBase, ABC):
     component_name = "Retrieval"
 
     def _run(self, history, **kwargs):
-        query = self.get_input()
-        query = str(query["content"][0]) if "content" in query else ""
-        query = re.split(r"(USER:|ASSISTANT:)", query)[-1]
+        queries = self.get_input()
+        queries = [str(q) for q in queries["content"]] if "content" in queries else []
 
         kb_ids: list[str] = self._param.kb_ids or []
 
@@ -95,34 +94,51 @@ class Retrieval(ComponentBase, ABC):
         if self._param.rerank_id:
             rerank_mdl = LLMBundle(kbs[0].tenant_id, LLMType.RERANK, self._param.rerank_id)
 
-        if kbs:
+        all_chunks = []
+        all_doc_aggs = []
+        for query in queries:
+            query = re.split(r"(USER:|ASSISTANT:)", query)[-1]
             query = re.sub(r"^user[:：\s]*", "", query, flags=re.IGNORECASE)
-            kbinfos = settings.retrievaler.retrieval(
-                query,
-                embd_mdl,
-                [kb.tenant_id for kb in kbs],
-                filtered_kb_ids,
-                1,
-                self._param.top_n,
-                self._param.similarity_threshold,
-                1 - self._param.keywords_similarity_weight,
-                aggs=False,
-                rerank_mdl=rerank_mdl,
-                rank_feature=label_question(query, kbs),
-            )
-        else:
-            kbinfos = {"chunks": [], "doc_aggs": []}
+            if kbs:
+                kbinfos = settings.retrievaler.retrieval(
+                    query,
+                    embd_mdl,
+                    [kb.tenant_id for kb in kbs],
+                    filtered_kb_ids,
+                    1,
+                    self._param.top_n,
+                    self._param.similarity_threshold,
+                    1 - self._param.keywords_similarity_weight,
+                    aggs=False,
+                    rerank_mdl=rerank_mdl,
+                    rank_feature=label_question(query, kbs),
+                )
+            else:
+                kbinfos = {"chunks": [], "doc_aggs": []}
 
-        if self._param.use_kg and kbs:
-            ck = settings.kg_retrievaler.retrieval(query, [kb.tenant_id for kb in kbs], filtered_kb_ids, embd_mdl, LLMBundle(kbs[0].tenant_id, LLMType.CHAT))
-            if ck["content_with_weight"]:
-                kbinfos["chunks"].insert(0, ck)
+            if self._param.use_kg and kbs:
+                ck = settings.kg_retrievaler.retrieval(query, [kb.tenant_id for kb in kbs], filtered_kb_ids, embd_mdl, LLMBundle(kbs[0].tenant_id, LLMType.CHAT))
+                if ck["content_with_weight"]:
+                    kbinfos["chunks"].insert(0, ck)
 
-        if self._param.tavily_api_key:
-            tav = Tavily(self._param.tavily_api_key)
-            tav_res = tav.retrieve_chunks(query)
-            kbinfos["chunks"].extend(tav_res["chunks"])
-            kbinfos["doc_aggs"].extend(tav_res["doc_aggs"])
+            if self._param.tavily_api_key:
+                tav = Tavily(self._param.tavily_api_key)
+                tav_res = tav.retrieve_chunks(query)
+                kbinfos["chunks"].extend(tav_res["chunks"])
+                kbinfos["doc_aggs"].extend(tav_res["doc_aggs"])
+            
+            all_chunks.extend(kbinfos["chunks"])
+            all_doc_aggs.extend(kbinfos["doc_aggs"])
+
+        # Deduplicate chunks
+        unique_chunks = []
+        seen_chunk_ids = set()
+        for chunk in all_chunks:
+            if chunk["chunk_id"] not in seen_chunk_ids:
+                unique_chunks.append(chunk)
+                seen_chunk_ids.add(chunk["chunk_id"])
+        
+        kbinfos = {"chunks": unique_chunks, "doc_aggs": all_doc_aggs}
 
         if not kbinfos["chunks"]:
             df = Retrieval.be_output("")
@@ -131,5 +147,5 @@ class Retrieval(ComponentBase, ABC):
             return df
 
         df = pd.DataFrame({"content": kb_prompt(kbinfos, 200000), "chunks": json.dumps(kbinfos["chunks"])})
-        logging.debug("{} {}".format(query, df))
+        logging.debug("{} {}".format(queries, df))
         return df.dropna()

@@ -485,3 +485,33 @@ Output format (include only sections relevant to the image content):
 Ensure high accuracy, clarity, and completeness in your analysis, and include only the information present in the image. Avoid unnecessary statements about missing elements.
 """
     return prompt
+def retrieval_term_prompt(tenant_id, llm_id, query, topn=3):
+    from api.db.services.llm_service import LLMBundle
+
+    if llm_id2llm_type(llm_id) == "image2text":
+        chat_mdl = LLMBundle(tenant_id, LLMType.IMAGE2TEXT, llm_id)
+    else:
+        chat_mdl = LLMBundle(tenant_id, LLMType.CHAT, llm_id)
+
+    prompt = f"""
+Role: You are a search analyst.
+Task: Generate {topn} diverse and relevant search terms based on the user's query.
+Requirements:
+  - The search terms should be optimized for retrieval.
+  - The search terms should be in the same language as the user's query.
+  - Each search term should be on a new line.
+  - Output search terms ONLY.
+
+### User Query
+{query}
+
+"""
+    msg = [{"role": "system", "content": prompt}, {"role": "user", "content": "Output: "}]
+    _, msg = message_fit_in(msg, chat_mdl.max_length)
+    ans = chat_mdl.chat(prompt, msg[1:], {"temperature": 0.2})
+    if isinstance(ans, tuple):
+        ans = ans[0]
+    ans = re.sub(r"^.*</think>", "", ans, flags=re.DOTALL)
+    if ans.find("**ERROR**") >= 0:
+        return ""
+    return ans
