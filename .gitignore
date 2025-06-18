@@ -193,3 +193,5 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+# Ansible role
+ansible_role_ragflow/
