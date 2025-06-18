@@ -53,6 +53,7 @@ export enum Operator {
   Message = 'Message',
   Relevant = 'Relevant',
   RewriteQuestion = 'RewriteQuestion',
+  MultiQueryOptimizer = 'MultiQueryOptimizer',
   KeywordExtract = 'KeywordExtract',
   Baidu = 'Baidu',
   DuckDuckGo = 'DuckDuckGo',
@@ -99,6 +100,7 @@ export const AgentOperatorList = [
   Operator.Categorize,
   Operator.Message,
   Operator.RewriteQuestion,
+  Operator.MultiQueryOptimizer,
   Operator.KeywordExtract,
   Operator.Switch,
   Operator.Concentrator,
@@ -158,6 +160,14 @@ export const operatorMap: Record<
     iconFontSize: 16,
   },
   [Operator.RewriteQuestion]: {
+    backgroundColor: '#f8c7f8',
+    color: '#f32bf3',
+    width: 70,
+    height: 70,
+    fontSize: 12,
+    iconFontSize: 16,
+  },
+  [Operator.MultiQueryOptimizer]: {
     backgroundColor: '#f8c7f8',
     color: '#f32bf3',
     width: 70,
@@ -269,6 +279,9 @@ export const componentMenuList = [
 
   {
     name: Operator.RewriteQuestion,
+  },
+  {
+    name: Operator.MultiQueryOptimizer,
   },
   {
     name: Operator.KeywordExtract,
@@ -434,6 +447,12 @@ export const initialGenerateValues = {
 export const initialRewriteQuestionValues = {
   ...initialLlmBaseValues,
   language: '',
+  message_history_window_size: 6,
+};
+
+export const initialMultiQueryOptimizerValues = {
+  ...initialLlmBaseValues,
+  output_count: 3,
   message_history_window_size: 6,
 };
 
@@ -778,6 +797,7 @@ export const NodeMap = {
   [Operator.Message]: 'messageNode',
   [Operator.Relevant]: 'relevantNode',
   [Operator.RewriteQuestion]: 'rewriteNode',
+  [Operator.MultiQueryOptimizer]: 'rewriteNode',
   [Operator.KeywordExtract]: 'keywordNode',
   [Operator.DuckDuckGo]: 'ragNode',
   [Operator.Baidu]: 'ragNode',

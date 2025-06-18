@@ -14,6 +14,7 @@ export const OperatorIconMap = {
   // [Operator.Answer]: SendOutlined,
   [Operator.Begin]: CirclePlay,
   [Operator.Categorize]: 'a-QuestionClassification',
+  [Operator.MultiQueryOptimizer]: 'a-QuestionClassification',
   [Operator.Message]: 'reply',
   [Operator.Iteration]: 'loop',
   [Operator.Switch]: 'condition',

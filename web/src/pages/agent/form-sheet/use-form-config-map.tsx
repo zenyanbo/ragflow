@@ -32,6 +32,7 @@ import QWeatherForm from '../form/qweather-form';
 import RelevantForm from '../form/relevant-form';
 import RetrievalForm from '../form/retrieval-form/next';
 import RewriteQuestionForm from '../form/rewrite-question-form';
+import MultiQueryOptimizerForm from '../form/multi-query-optimizer-form';
 import SwitchForm from '../form/switch-form';
 import TemplateForm from '../form/template-form';
 import TuShareForm from '../form/tushare-form';
@@ -161,6 +162,16 @@ export function useFormConfigMap() {
         llm_id: z.string(),
         message_history_window_size: z.number(),
         language: z.string(),
+      }),
+    },
+    [Operator.MultiQueryOptimizer]: {
+      component: MultiQueryOptimizerForm,
+      defaultValues: {
+        message_history_window_size: 6,
+      },
+      schema: z.object({
+        llm_id: z.string(),
+        output_count: z.number(),
       }),
     },
     [Operator.Code]: {
