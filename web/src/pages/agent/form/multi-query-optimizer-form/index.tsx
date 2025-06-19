@@ -1,7 +1,7 @@
-import { LlmProvider } from '@/components/llm-provider';
+import { NextLLMSelect as LlmProvider } from '@/components/llm-select/next';
 import { NumberInput } from '@/components/ui/number-input';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useTranslate } from '@/hooks/use-translate';
+import { useTranslate } from '@/hooks/common-hooks';
 import { IOperatorForm } from '@/pages/agent/interface';
 import { useForm } from 'react-hook-form';
 import { initialMultiQueryOptimizerValues } from '../../constant';
