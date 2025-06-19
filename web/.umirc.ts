@@ -7,7 +7,7 @@ import routes from './src/routes';
 export default defineConfig({
   title: appName,
   outputPath: 'dist',
-  alias: { '@': path.resolve(__dirname, './src'), '@parent': path.resolve(__dirname, '../') },
+  alias: { '@parent': path.resolve(__dirname, '../') },
   npmClient: 'npm',
   base: '/',
   routes,
