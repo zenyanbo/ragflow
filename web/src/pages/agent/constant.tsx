@@ -751,6 +751,12 @@ export const RestrictedUpstreamMap = {
     Operator.RewriteQuestion,
     Operator.Relevant,
   ],
+  [Operator.MultiQueryOptimizer]: [
+    Operator.Begin,
+    Operator.Message,
+    Operator.MultiQueryOptimizer,
+    Operator.Relevant,
+  ],
   [Operator.KeywordExtract]: [
     Operator.Begin,
     Operator.Message,
@@ -797,7 +803,7 @@ export const NodeMap = {
   [Operator.Message]: 'messageNode',
   [Operator.Relevant]: 'relevantNode',
   [Operator.RewriteQuestion]: 'rewriteNode',
-  [Operator.MultiQueryOptimizer]: 'rewriteNode',
+  [Operator.MultiQueryOptimizer]: 'multiQueryOptimizerNode',
   [Operator.KeywordExtract]: 'keywordNode',
   [Operator.DuckDuckGo]: 'ragNode',
   [Operator.Baidu]: 'ragNode',

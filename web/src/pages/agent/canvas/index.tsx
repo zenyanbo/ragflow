@@ -41,6 +41,7 @@ import NoteNode from './node/note-node';
 import { RelevantNode } from './node/relevant-node';
 import { RetrievalNode } from './node/retrieval-node';
 import { RewriteNode } from './node/rewrite-node';
+import { MultiQueryOptimizerNode } from './node/multi-query-optimizer-node';
 import { SwitchNode } from './node/switch-node';
 import { TemplateNode } from './node/template-node';
 
@@ -56,6 +57,7 @@ const nodeTypes: NodeTypes = {
   retrievalNode: RetrievalNode,
   messageNode: MessageNode,
   rewriteNode: RewriteNode,
+  multiQueryOptimizerNode: MultiQueryOptimizerNode,
   keywordNode: KeywordNode,
   invokeNode: InvokeNode,
   templateNode: TemplateNode,
